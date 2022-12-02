@@ -22,4 +22,3 @@ class Test(TestCase):
         self.assertEqual(expected_value_task1, actual_value_task1)
         actual_value_task2 = d2.task2()
         self.assertEqual(expected_value_task2, actual_value_task2)
-

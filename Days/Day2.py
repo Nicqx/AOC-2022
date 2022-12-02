@@ -62,7 +62,7 @@ class Day2:
                             new_my_list.append("Y")
                         case "C":
                             new_my_list.append("Z")
-                case"Z":
+                case "Z":
                     match self.opponent_list[rps_round]:
                         case "A":
                             new_my_list.append("Y")
