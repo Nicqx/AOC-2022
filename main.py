@@ -39,4 +39,4 @@ if __name__ == '__main__':
 
     d9 = Day9('Resources/Day9/input')
     print("day9 task1: " + d9.task1())
-    # print("day9 task2: " + d9.task2())
+    print("day9 task2: " + d9.task2())
