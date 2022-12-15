@@ -1,4 +1,5 @@
 from Days.Day1 import Day1
+from Days.Day10 import Day10
 from Days.Day2 import Day2
 from Days.Day3 import Day3
 from Days.Day4 import Day4
@@ -40,3 +41,8 @@ if __name__ == '__main__':
     d9 = Day9('Resources/Day9/input')
     print("day9 task1: " + d9.task1())
     print("day9 task2: " + d9.task2())
+
+    d10 = Day10('Resources/Day10/input')
+    print("day10 task1: " + d10.task1())
+    print("day10 task2: ")
+    d10.print_crt()
