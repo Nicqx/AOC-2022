@@ -1,13 +1,17 @@
 import sys
+from collections import deque
 
 
 class Day12:
     level_map = "SabcdefghijklmnopqrstuvwxyzE"
     map_table = []
     level_table = []
-    paths = set()
+    paths = deque()
+    s_e_path = []
     max_x = 0
     max_y = 0
+    start = []
+    end = []
 
     def __init__(self, file):
         self.map_table.clear()
@@ -22,64 +26,68 @@ class Day12:
                 line = f.readline().removesuffix("\n")
 
     def task1(self):
-        counter = 0
-        shortest = sys.maxsize
-        start = self.get_coord('S')
-        end = self.get_coord('E')
-        self.map_table[start[1]][start[0]] = 'a'
-        self.map_table[end[1]][end[0]] = 'z'
+        self.start = self.get_coord('S')
+        self.end = self.get_coord('E')
+        self.map_table[self.start[1]][self.start[0]] = 'a'
+        self.map_table[self.end[1]][self.end[0]] = 'z'
         self.max_x = len(self.map_table[0])
         self.max_y = len(self.map_table)
         self.crate_level_table()
-        self.paths.add(tuple([start]))
-        while (self.genPath()):
-            pass
+        self.paths.append([self.start])
+        while len(self.paths) > 0:
+            self.gen_route(self.paths.popleft())
 
-        return ""
+        return str(self.find_shortest_path())
 
-    def genPath(self):
-        is_new = False
-        for path in self.paths:
-            self.genRoute(path)
+    def find_shortest_path(self):
+        minimal = sys.maxsize
+        for item in self.s_e_path:
+            if len(item) < minimal:
+                minimal = len(item)
+        return minimal - 1
 
-        return is_new
-
-    def genRoute(self, path):
+    def gen_route(self, path):
         point = path[-1]
         point_value = self.level_table[point[1]][point[0]]
+        if self.check_if_the_e_reached(path):
+            return
         # up
         if (point[0] >= 1) and not (path.__contains__([point[0] - 1, point[1]])) and self.compare_the_values(
                 self.level_table[point[1]][point[0] - 1], point_value):
-            p = path
-            p.add([point[0] - 1, point[1]])
-            self.paths.add(tuple(p))
+            p = path.copy()
+            p.append([point[0] - 1, point[1]])
+            self.paths.append(p)
         # down
         if (point[0] < self.max_x - 1) and not (
                 path.__contains__([point[0] + 1, point[1]])) and self.compare_the_values(
                 self.level_table[point[1]][point[0] + 1], point_value):
-            p = path
-            p.add([point[0] + 1, point[1]])
-            self.paths.add(tuple(p))
+            p = path.copy()
+            p.append([point[0] + 1, point[1]])
+            self.paths.append(p)
         # left
-        if (point[1] >= 1) and not (path.__contains__([point[0], point[1] + 1])) and self.compare_the_values(
-                self.level_table[point[1] + 1][point[0]], point_value):
-            p = path
-            p.add([point[0], point[1] + 1])
-            self.paths.add(tuple(p))
+        if (point[1] >= 1) and not (path.__contains__([point[0], point[1] - 1])) and self.compare_the_values(
+                self.level_table[point[1] - 1][point[0]], point_value):
+            p = path.copy()
+            p.append([point[0], point[1] - 1])
+            self.paths.append(p)
         # right
         if (point[1] < self.max_y - 1) and not (
-                path.__contains__([point[0], point[1] - 1])) and self.compare_the_values(
-                self.level_table[point[1] - 1][point[0]], point_value):
-            p = path
-            p.add([point[0], point[1] - 1])
-            self.paths.add(tuple(p))
-        self.paths.remove(path)
+                path.__contains__([point[0], point[1] + 1])) and self.compare_the_values(
+                self.level_table[point[1] + 1][point[0]], point_value):
+            p = path.copy()
+            p.append([point[0], point[1] + 1])
+            self.paths.append(p)
 
-    def compare_the_values(self, new, old):
+    @staticmethod
+    def compare_the_values(new, old):
         return new == old or new == old + 1 or new < old
 
-    def collectValidRoutesFromPaths(self):
-        pass
+    def check_if_the_e_reached(self, path):
+        if path[-1] == self.end:
+            self.s_e_path.append(path)
+            return True
+        else:
+            return False
 
     def get_coord(self, char):
         for y in range(len(self.map_table)):
