@@ -12,9 +12,14 @@ class Day12:
     max_y = 0
     start = []
     end = []
+    visited = []
 
     def __init__(self, file):
         self.map_table.clear()
+        self.level_table.clear()
+        self.s_e_path.clear()
+        self.visited.clear()
+        self.paths.clear()
         with open(file) as f:
             line = f.readline().removesuffix("\n")
             while line != "":
@@ -26,6 +31,10 @@ class Day12:
                 line = f.readline().removesuffix("\n")
 
     def task1(self):
+        self.level_table.clear()
+        self.s_e_path.clear()
+        self.visited.clear()
+        self.paths.clear()
         self.start = self.get_coord('S')
         self.end = self.get_coord('E')
         self.map_table[self.start[1]][self.start[0]] = 'a'
@@ -38,6 +47,45 @@ class Day12:
             self.gen_route(self.paths.popleft())
 
         return str(self.find_shortest_path())
+
+    def task2(self):
+        self.level_table.clear()
+        self.s_e_path.clear()
+        self.visited.clear()
+        self.paths.clear()
+        self.start = self.get_coord('S')
+        self.end = self.get_coord('E')
+        self.map_table[self.start[1]][self.start[0]] = 'a'
+        self.map_table[self.end[1]][self.end[0]] = 'z'
+        self.max_x = len(self.map_table[0])
+        self.max_y = len(self.map_table)
+        self.crate_level_table()
+        self.paths.append([self.start])
+        while len(self.paths) > 0:
+            self.gen_route(self.paths.popleft())
+
+        return str(self.find_trail_in_the_shortest_path())
+
+    def find_trail_in_the_shortest_path(self):
+        minimal = sys.maxsize
+        start_points = []
+        start_points.clear()
+        for j in range(len(self.map_table)):
+            for i in range(len(self.map_table[j])):
+                if self.map_table[j][i] == 'a':
+                    start_points.append([i, j])
+        for element in start_points:
+            self.start = element
+            self.paths.clear()
+            self.s_e_path.clear()
+            self.visited.clear()
+            self.paths.append([self.start])
+            while len(self.paths) > 0:
+                self.gen_route(self.paths.popleft())
+            if self.find_shortest_path() < minimal:
+                minimal = self.find_shortest_path()
+
+        return str(minimal)
 
     def find_shortest_path(self):
         minimal = sys.maxsize
@@ -53,29 +101,37 @@ class Day12:
             return
         # up
         if (point[0] >= 1) and not (path.__contains__([point[0] - 1, point[1]])) and self.compare_the_values(
-                self.level_table[point[1]][point[0] - 1], point_value):
+                self.level_table[point[1]][point[0] - 1], point_value) and not (
+                self.visited.__contains__([point[0] - 1, point[1]])):
             p = path.copy()
             p.append([point[0] - 1, point[1]])
+            self.visited.append([point[0] - 1, point[1]])
             self.paths.append(p)
         # down
         if (point[0] < self.max_x - 1) and not (
                 path.__contains__([point[0] + 1, point[1]])) and self.compare_the_values(
-                self.level_table[point[1]][point[0] + 1], point_value):
+            self.level_table[point[1]][point[0] + 1], point_value) and not (
+                self.visited.__contains__([point[0] + 1, point[1]])):
             p = path.copy()
             p.append([point[0] + 1, point[1]])
+            self.visited.append([point[0] + 1, point[1]])
             self.paths.append(p)
         # left
         if (point[1] >= 1) and not (path.__contains__([point[0], point[1] - 1])) and self.compare_the_values(
-                self.level_table[point[1] - 1][point[0]], point_value):
+                self.level_table[point[1] - 1][point[0]], point_value) and not (
+                self.visited.__contains__([point[0], point[1] - 1])):
             p = path.copy()
             p.append([point[0], point[1] - 1])
+            self.visited.append([point[0], point[1] - 1])
             self.paths.append(p)
         # right
         if (point[1] < self.max_y - 1) and not (
                 path.__contains__([point[0], point[1] + 1])) and self.compare_the_values(
-                self.level_table[point[1] + 1][point[0]], point_value):
+            self.level_table[point[1] + 1][point[0]], point_value) and not (
+                self.visited.__contains__([point[0], point[1] + 1])):
             p = path.copy()
             p.append([point[0], point[1] + 1])
+            self.visited.append([point[0], point[1] + 1])
             self.paths.append(p)
 
     @staticmethod
